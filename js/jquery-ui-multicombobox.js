@@ -20,7 +20,6 @@
             this.placeholder = $("<div style='margin: 4px 8px;' class='placeholder'></div>").insertBefore(select);
             var input = this.input = $( "<input>" )
             .insertAfter( select )
-            .val( value )
             .autocomplete({
                 delay: 0,
                 minLength: 0,
