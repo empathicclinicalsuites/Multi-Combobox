@@ -45,6 +45,7 @@
                     self._trigger( "selected", event, {
                         item: ui.item.option
                     });
+                    
                     self._combodropSelection(ui.item);
                     $( this ).val( "" );
                     return false;
@@ -114,8 +115,12 @@
             $(".ui-autocomplete-input").css("paddingBottom","0.4em");
             $(".ui-autocomplete-input").css("paddingLeft","0.45em");
             
-            console.log()
-            
+            console.log(selected.size())
+            for(var x =0;x<selected.size();x++)
+            {
+              self._addSelectionFromOption(selected[x])
+              console.log(selected[x])
+            }
         },
 
         destroy: function() {
@@ -153,41 +158,38 @@
             return;
         },
         
+        _addSelectionFromOption: function(option)
+        {
+          var self = this;
+          var name = $(option).text();
+          var selectForm = $(option).parentNode;
+          var selectFormId = $(selectForm).attr("id");
+          var selectIdPound = "#" + selectFormId;
+          if (!this._inArray(name,this.addingArray)) {
+              this.addingArray.push(name);
+              var divNameId = "addedNameId" + this.uniqueId + selectFormId;
+              var deleterId = "deleteId" + this.uniqueId + selectFormId;
+              this.placeholder.append('<div style="padding:3px 6px; margin-bottom:5px; background-color: #F5F5F5; color:#555;" id="'+ divNameId +'" class="addedName ui-state-error-text"><p style="float:left; width:160px; margin:4px 0;font-size:.9em;" class="addedName">'+ name +'</p><input id="'+ deleterId +'" class="deleteButton ui-icon ui-icon-circle-close" type="button" title="Remove" value="" style="background-color: #F5F5F5; float: right; width: 16px; border:none;margin-top:3px;"/><div style="clear:both;"></div></div>');
+              
+              $('#'+deleterId).click(function(){
+                  self._combodropDeletion(name,"#"+divNameId,selectIdPound);
+              });
+              
+              $('#'+deleterId).mouseover(function(){
+                  $('#'+deleterId).css('cursor','pointer');
+              });
+              $('#'+deleterId).mouseout(function(){
+                  $('#'+deleterId).css('cursor','auto');
+              });
+              
+              this.uniqueId = this.uniqueId + 1;
+          }
+        },
+        
         _combodropSelection: function(itemSelected) {
             var self = this;
+            self._addSelectionFromOption(itemSelected.option);
             
-            var name = itemSelected.value;
-            var selectForm = itemSelected.option.parentNode;
-            var selectFormId = $(selectForm).attr("id");
-            var selectIdPound = "#" + selectFormId;
-            
-            if (!this._inArray(name,this.addingArray)) {
-                this.addingArray.push(name);
-                var divNameId = "addedNameId" + this.uniqueId + selectFormId;
-                var deleterId = "deleteId" + this.uniqueId + selectFormId;
-                this.placeholder.append('<div style="padding:3px 6px; margin-bottom:5px; background-color: #F5F5F5; color:#555;" id="'+ divNameId +'" class="addedName ui-state-error-text"><p style="float:left; width:160px; margin:4px 0;font-size:.9em;" class="addedName">'+ name +'</p><input id="'+ deleterId +'" class="deleteButton ui-icon ui-icon-circle-close" type="button" title="Remove" value="" style="background-color: #F5F5F5; float: right; width: 16px; border:none;margin-top:3px;"/><div style="clear:both;"></div></div>');
-                
-                $('#'+deleterId).click(function(){
-                    self._combodropDeletion(name,"#"+divNameId,selectIdPound);
-                });
-                
-                //ui hover state currently removes icon, which is not desired
-//                $('#'+deleterId).mouseover(function(){
-//                    $('#'+deleterId).addClass("ui-state-hover");
-//                });
-//                $('#'+deleterId).mouseout(function(){
-//                    $('#'+deleterId).removeClass("ui-state-hover");
-//                });
-                //so instead, just changing the icon to a pointer
-                $('#'+deleterId).mouseover(function(){
-                    $('#'+deleterId).css('cursor','pointer');
-                });
-                $('#'+deleterId).mouseout(function(){
-                    $('#'+deleterId).css('cursor','auto');
-                });
-                
-                this.uniqueId = this.uniqueId + 1;
-            }
         },
         
         _combodropDeletion: function(name, divId, selectId) {
